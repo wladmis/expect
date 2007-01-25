@@ -266,7 +266,7 @@ install-doc: doc
 	done
 
 test: binaries libraries
-	$(TCLSH) `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS)
+	echo "load $(PKG_LIB_FILE); source [file join $(srcdir) tests all.tcl]" | $(TCLSH)
 
 shell: binaries libraries
 	@$(TCLSH) $(SCRIPT)
