@@ -113,7 +113,7 @@ proc putdirectory {name} {
     } timeout {
 	send_user "timed out on make remote directory $name\n"
 	return 0
-    } -re "(257|550.*exists).*ftp>.*"
+    } -re "(257|553|550.*exists).*ftp>.*"
     # 550 is returned if directory already exists
 
     send "cd $name\r"
