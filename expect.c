@@ -41,8 +41,17 @@ would appreciate credit if this program or parts of it are used.
 #include "tcldbg.h"
 #endif
 
+/* The initial length is 2000. We increment it by 2000. The maximum
+   is 8MB (0x800000).  */
+#define EXP_MATCH_MAX		2000
+#define EXP_MATCH_INC		2000
+#define EXP_MATCH_STEP_LIMIT	0x700000
+#define EXP_MATCH_LIMIT		0x800000
+#define EXP_MATCH_LIMIT_QUOTE	"0x800000"
+
 /* initial length of strings that we can guarantee patterns can match */
-int exp_default_match_max =	2000;
+int exp_default_match_max =	EXP_MATCH_MAX;
+int exp_default_match_max_changed = 0;
 #define INIT_EXPECT_TIMEOUT_LIT	"10"	/* seconds */
 #define INIT_EXPECT_TIMEOUT	10	/* seconds */
 int exp_default_parity =	TRUE;
@@ -1619,6 +1628,76 @@ expNullStrip(obj,offsetBytes)
     return newsize;
 }
 
+/* returns # of bytes until we see a newline at the end or EOF.  */
+/*ARGSUSED*/
+static int
+expReadNewLine(interp,esPtr,save_flags) /* INTL */
+Tcl_Interp *interp;
+ExpState *esPtr;
+int save_flags;
+{
+    int size;
+    int exp_size;
+    int full_size;
+    int count;
+    char *str;
+
+    count = 0;
+    for (;;) {
+	exp_size = expSizeGet(esPtr);
+
+	/* When we reach the limit, we will only read one char at a
+	   time.  */
+	if (esPtr->umsize >= EXP_MATCH_STEP_LIMIT)
+	    size = TCL_UTF_MAX;
+	else
+	    size = exp_size;
+
+	if (exp_size + TCL_UTF_MAX >= esPtr->msize) {
+	    if (esPtr->umsize >= EXP_MATCH_LIMIT) {
+		expDiagLogU("WARNING: interact buffer is full. probably your program\r\n");
+		expDiagLogU("is not interactive or has a very long output line. The\r\n");
+		expDiagLogU("current limit is " EXP_MATCH_LIMIT_QUOTE ".\r\n");
+		expDiagLogU("Dumping first half of buffer in order to continue\r\n");
+		expDiagLogU("Recommend you enlarge the buffer.\r\n");
+		exp_buffer_shuffle(interp,esPtr,save_flags,EXPECT_OUT,"expect");
+		return count;
+	    }
+	    else {
+		esPtr->umsize += EXP_MATCH_INC;
+		expAdjust(esPtr);
+	    }
+	}
+
+	full_size = esPtr->msize - (size / TCL_UTF_MAX);
+	size = Tcl_ReadChars(esPtr->channel,
+			esPtr->buffer,
+			full_size,
+			1 /* append */);
+	if (size > 0) {
+	    count += size;
+	    /* We try again if there are more to read and we haven't
+	       seen a newline at the end. */
+	    if (size == full_size) {
+		str = Tcl_GetStringFromObj(esPtr->buffer, &size);
+		if (str[size - 1] != '\n')
+		    continue;
+	    }
+	}
+	else {
+	    /* It is even trickier. We got an error from read. We have
+	       to recover from it. Let's make sure the size of
+	       buffer is correct. It can be corrupted. */
+	    str = Tcl_GetString(esPtr->buffer);
+	    Tcl_SetObjLength(esPtr->buffer, strlen(str));
+	}
+
+	break;
+    }
+
+    return count;
+}
+
 /* returns # of bytes read or (non-positive) error of form EXP_XXX */
 /* returns 0 for end of file */
 /* If timeout is non-zero, set an alarm before doing the read, else assume */
@@ -1633,6 +1712,8 @@ int save_flags;
 {
     int cc = EXP_TIMEOUT;
     int size = expSizeGet(esPtr);
+    int full_size;
+    int count;
 
     if (size + TCL_UTF_MAX >= esPtr->msize) 
 	exp_buffer_shuffle(interp,esPtr,save_flags,EXPECT_OUT,"expect");
@@ -1649,11 +1730,43 @@ int save_flags;
     }
 #endif
 
-    
+    /* FIXME: If we ask less than what is available in the tcl buffer
+       when tcl has seen EOF, we will throw away the remaining data
+       since the next read will get EOF. Since expect is line-oriented,
+       we exand our buffer to get EOF or the next newline at the end of
+       the input buffer. I don't know if it is the right fix.  H.J. */
+    count = 0;
+    full_size = esPtr->msize - (size / TCL_UTF_MAX);
     cc = Tcl_ReadChars(esPtr->channel,
-	    esPtr->buffer,
-	    esPtr->msize - (size / TCL_UTF_MAX),
-	    1 /* append */);
+		esPtr->buffer,
+		full_size,
+		1 /* append */);
+    if (cc > 0) {
+	count += cc;
+	/* It gets very tricky. There are more to read. We will expand
+	   our buffer and get EOF or a newline at the end unless the
+	   buffer length has been changed.  */
+	if (cc == full_size) {
+	    char *str;
+	    str = Tcl_GetStringFromObj(esPtr->buffer, &size);
+	    if (str[size - 1] != '\n') {
+		if (esPtr->umsize_changed) {
+		    char buf[20];	/* big enough for 64bit int in hex.  */
+		    snprintf(buf,sizeof(buf),"0x%x", esPtr->umsize);
+		    expDiagLogU("WARNING: interact buffer is not large enough to hold\r\n");
+		    expDiagLogU("all output. probably your program is not interactive or\r\n");
+		    expDiagLogU("has a very long output line. The current limit is ");
+		    expDiagLogU(buf);
+		    expDiagLogU(".\r\n");
+		}
+		else {
+		    cc = expReadNewLine(interp,esPtr,save_flags);
+		    if (cc > 0)
+			count += cc;
+		}
+	    }
+	}
+    }
     i_read_errno = errno;
 
 #ifdef SIMPLE_EVENT
@@ -1674,7 +1787,7 @@ int save_flags;
 	}
     }
 #endif
-    return cc;	
+    return count > 0 ? count : cc;
 }
 
 /*
@@ -2758,8 +2871,14 @@ char **argv;
 	return(TCL_ERROR);
     }
 
-    if (Default) exp_default_match_max = size;
-    else esPtr->umsize = size;
+    if (Default) {
+	exp_default_match_max = size;
+	exp_default_match_max_changed = 1;
+    }
+    else {
+	esPtr->umsize = size;
+	esPtr->umsize_changed = 1;
+    }
 
     return(TCL_OK);
 }

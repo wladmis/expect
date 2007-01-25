@@ -30,6 +30,7 @@ would appreciate credit if this program or parts of it are used.
 EXTERN char *		exp_get_var _ANSI_ARGS_((Tcl_Interp *,char *));
 
 EXTERN int exp_default_match_max;
+EXTERN int exp_default_match_max_changed;
 EXTERN int exp_default_parity;
 EXTERN int exp_default_rm_nulls;
 EXTERN int exp_default_close_on_eof;
@@ -108,6 +109,7 @@ typedef struct ExpState {
     int msize;	        /* # of bytes that buffer can hold (max) */
     int umsize;	        /* # of bytes (min) that is guaranteed to match */
 			/* this comes from match_max command */
+    int umsize_changed;	/* is umsize changed by user?  */
     int printed;	/* # of bytes written to stdout (if logging on) */
                         /* but not actually returned via a match yet */
     int echoed;	        /* additional # of bytes (beyond "printed" above) */

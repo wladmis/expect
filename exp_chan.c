@@ -647,6 +647,7 @@ expCreateChannel(interp,fdin,fdout,pid)
     esPtr->buffer = Tcl_NewStringObj("",0);
     Tcl_IncrRefCount(esPtr->buffer);
     esPtr->umsize = exp_default_match_max;
+    esPtr->umsize_changed = exp_default_match_max_changed;
     /* this will reallocate object with an appropriate sized buffer */
     expAdjust(esPtr);
 
