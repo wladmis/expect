@@ -1,6 +1,3 @@
-# -*- rpm-spec -*-
-# $Id: expect,v 1.19 2006/07/23 15:47:58 me Exp $
-
 %define uver .0
 %def_with test
 
@@ -19,6 +16,7 @@ Source0: %name-%version.tar.bz2
 BuildRequires: tcl-devel >= 8.4.0-alt1
 Requires: tcl >= 8.4.0-alt1
 Requires: /dev/pts
+Requires: /proc
 
 %package devel
 Summary: Expect header files and lib%name manpage
@@ -101,7 +99,7 @@ EOF
 
 %changelog
 * Thu Jan 25 2007 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.43-alt3
-- fixed #10701
+- workaround for #10701
 
 * Sun Jul 23 2006 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.43-alt2
 - CVS snapshot @ 20060227
