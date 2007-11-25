@@ -1,1 +1,1 @@
-tar.bz2: . name=expect-@version@ base=
+tar: . name=@name@-@version@-@release@ base=@name@-@version@

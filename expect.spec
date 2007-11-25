@@ -1,9 +1,9 @@
-%define uver .0
+%define uver .1.4
 %def_with test
 
 Name: expect
-Version: 5.43
-Release: alt3
+Version: 5.44
+Release: alt1
 Serial: 1
 
 Summary: A tcl extension for simplifying program-script interaction
@@ -11,17 +11,22 @@ License: BSD
 Group: Development/Tcl
 Url: http://expect.nist.gov/
 
-Source0: %name-%version.tar.bz2
+Source0: %name-%version-%release.tar
 
-BuildRequires: tcl-devel >= 8.4.0-alt1
-Requires: tcl >= 8.4.0-alt1
+BuildRequires: tcl-devel >= 8.5.0-alt0.3
+%if_with test
+BuildRequires(pre): /dev/pts
+BuildRequires(pre): /proc
+%endif
+
+Requires: tcl >= 8.5.0-alt0.3
 Requires: /dev/pts
 Requires: /proc
 
 %package devel
 Summary: Expect header files and lib%name manpage
 Group: Development/C
-Requires: %name = %serial:%version-%release tcl-devel >= 8.4.0-alt1
+Requires: %name = %serial:%version-%release tcl-devel >= 8.5.0-alt0.3
 
 %package examples
 Summary: Example applications using Expect
@@ -55,7 +60,7 @@ to control another program and interact with it.
 This package provides example programs found in expect bundle.
 
 %prep
-%setup -c
+%setup
 
 %build
 autoconf
@@ -98,6 +103,10 @@ EOF
 %exclude %_man1dir/autoexpect.*
 
 %changelog
+* Sun Nov 25 2007 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.44-alt1
+- CVS snapshot @ 20070925
+- rebuilt with tcl8.5
+
 * Thu Jan 25 2007 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.43-alt3
 - workaround for #10701
 
