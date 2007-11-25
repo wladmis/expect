@@ -1,3 +1,161 @@
+2007-09-24  Andreas Kupries  <andreask@activestate.com>
+
+	* exp_inter.c: Changed inclusion of tcl.h to tclInt.h to get the
+	* expect.c: definition of TCL_REG_BOSONLY, which was moved to that
+	  header in Tcl 8.5. Ditto for expect.c, for the macro
+	  TclUtfToUniChar (was a function in 8.4). Expect now compiles
+	  again for both Tcl 8.4 and 8.5.
+
+	* configure.in: Bumped version to 5.44.1.4.
+	* configure: Regenerated.
+
+2007-09-19  Andreas Kupries  <andreask@activestate.com>
+
+	* retoglob.c (EMITC): Keep the characters '^' and '$' quoted as
+	  well, we do not wish to invoke their special interpretation by
+	  the Expect glob matcher.
+	* configure.in: Bumped version to 5.44.1.3.
+	* configure: Regenerated.
+
+2007-08-09  Andreas Kupries  <andreask@activestate.com>
+
+	* retoglob.c: We had ExpChopNested and ExpBackslash locally
+	  ansified (prototypes) to avoid a compiler error on AIX (type
+	  promotion trouble). This now integrated into the mainline
+	  sources, conditional to AIX.
+
+	* expect.c (Exp_TimestampObjCmd): Fixed argument processing broken
+	  by objc,objv conversion. Tried to use command name as the
+	  argument for -seconds. Also did not detect when one argument to
+	  many was specified.
+
+	* configure.in: Bumped version to 5.44.1.2.
+	* configure: Regenerated.
+
+2007-07-17  Andreas Kupries <andreask@activestate.com>
+
+	* expect.c: Circumvented problems with the C compiler by use of a
+	  temporary variable to hold the unicode pointer of a glob
+	  pattern. The computed pattern length given to
+	  Exp_StringCaseMatch was bogus.
+
+	* exp_glob.c: Added tracing of the glob matcher internals (Can be
+	  enabled by define EXP_INTERNAL_TRACE_GLOB). Fixed bug in a guard
+	  condition in the optimized handling of '*'. The bad condition
+	  caused the code to miss possible matches at the beginning of the
+	  input (first char).
+
+	* tests/expect.test: Added tests which check the glob matcher and
+	  RE gate keeping.
+
+	* configure.in: Bumped to 5.44.1.1 to separate this from the
+	  regular 5.44.1 sources.
+	* configure: Regenerated.
+
+2007-07-12  Andreas Kupries  <andreask@activestate.com>
+
+	* expect.c: Found bugs mismanaging input and pattern in the
+	* exp_glob.c: updated glob matcher. We cannot check for '\0'
+	  anymore to find the end of the string, these are counted
+	  arrays now. Rewritten to use sentinel pointers.
+
+2007-07-11  Andreas Kupries  <andreask@activestate.com>
+
+	* exp_chan.c: Converted the buffering system from UTF-8 in Tcl_Obj
+	* exp_command.h: to UTF-16 C-array, to avoid the repeated conversion
+	* expect.c: of the input from utf-8 to utf-16. Updated the glob
+	* exp_glob.c: matching code to use the same tricks for speed which
+	* exp_inter.c: are used by the Tcl core. Extended the regexp
+	* exp_log.c: matching path with a glob matcher which uses a gate
+	* exp_log.h: keeper glob pattern to weed out most non-candidates
+	* retoglob.c (New file): in a speedy manner. Regexp matching now
+	  has to be done only for the small number of candidates
+	  identified by the gate keeper. Overall speed improvement as glob
+	  matching is faster than regexp matching. Added code translating
+	  regular expressions into their gate keeper glob pattern.
+
+	* Dbg.c: Converted the lot of argc,argv based command
+	* exp_command.c: implementations over to objc,objv.
+	* expect.c:
+	* exp_main_sub.c:
+
+	* Dbg.c: Cleaned up the direct access to interp->result,
+	* exp_command.c: replaced with the proper functions and
+	* expect.c: Tcl_Obj's.
+	* exp_main_exp.c:
+	* exp_main_sub.c:
+	* exp_main_tk.c:
+	* exp_prog.h:
+	* exp_trap.c:
+	* exp_tty.c:
+	* exp_win.c:
+	* exp_win.h:
+
+	* tests/cat.test: Added proper 'package require Expect'
+	* tests/expect.test: to the test setup code (JeffH).
+	* tests/logfile.test:
+	* tests/pid.test:
+	* tests/send.test:
+	* tests/spawn.test:
+	* tests/stty.test:
+
+	* exp_command.c: Reformatted overlong lines, whitespace,
+	* expect.c: comments. Added braces to some if-constructs.
+	* exp_inter.c: Reworked if-constructs interleaved with
+	* exp_tty.c: #if for better formatting in emacs.
+
+	* Dbg.c: Added note about unhandled cases in a switch.
+	* exp_chan.c: Added code to suppress unhandled warning for
+	  unreachable code.
+	* exp_command.c: Removed unused variable.
+	* expect.c: Removed unused static function, added code to suppress
+	  unhandled warning for unreachable code.
+
+	* exp_command.c: Fixed typo in comment.
+
+2007-06-28  Andreas Kupries <andreask@activestate.com>
+
+	* Merged changes from the official version 5.44.1 of expect into
+	  the SF sources. See the details below.
+
+	  --------------------
+	  Marius Schamsula <marius173@mchsi.xcom> reported tclconfig
+	  missing, evidentally for new TEA.
+
+	  Lots of massaging to fix TEAification of Makefile and configure
+	  including that version numbers will now be full three part.
+
+	  Daniel Wong <danielwong@berkeley.xedu> noted the home page
+	  should note that Wikipedia has a very readable entry for Expect.
+
+	  Andre Alves <aalves@escloyalty.xcom> noted passmass needed some
+	  fixes to handle Solaris 9 passwd prompt changes.
+
+	  Andreas fixed several things: changes to better support TEA, fix
+	  debugger interaction with nonblocking mode, and probably other
+	  things I'm overlooking.
+
+	  Martin Dietze <di@fh-wedel.xde> noted that autoconf 2.59 is
+	  confused by C comment after undefs in expect_cf.h.in.
+
+	  Added additional code to unbuffer -p so that if a process
+	  earlier in the pipeline exits, unbuffer attempts to recover any
+	  remaining output from the spawned proc before unbuffer itself
+	  exits.
+
+	  Jeffrey Hobbs noted that once stty was called, a bg'd script
+	  would be suspended at exit.  Turned out to be overaggressive
+	  code in stty that recorded what 'damage' the user might have
+	  caused when calling stty in the first place.
+
+	  Jens Petersen provided patch to make setpgrp configure better on
+	  some Linux systems.
+
+	  Added example/getpassck script to test for getpass bug.
+
+	  multixterm had debugging stuff leftover ("hello").
+	  --------------------
+	
 2006-02-27  Andreas Kupries <andreask@activestate.com>
 
 	* exp_main_sub.c: Added command 'exp_configure' for magic configuration.

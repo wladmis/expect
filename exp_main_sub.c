@@ -175,7 +175,7 @@ static char prompt1_default[] = "expect%d.%d> ";
 
 /*ARGSUSED*/
 int
-Exp_Prompt1Cmd(clientData, interp, objc, objv)
+Exp_Prompt1ObjCmd(clientData, interp, objc, objv)
 ClientData clientData;
 Tcl_Interp *interp;
 int objc;
@@ -192,7 +192,7 @@ Tcl_Obj *CONST objv[];		/* Argument objects. */
 
 /*ARGSUSED*/
 int
-Exp_Prompt2Cmd(clientData, interp, objc, objv)
+Exp_Prompt2ObjCmd(clientData, interp, objc, objv)
 ClientData clientData;
 Tcl_Interp *interp;
 int objc;
@@ -229,10 +229,10 @@ int check_for_nostack;
 	char *msg;
 
 	/* if errorInfo has something, print it */
-	/* else use what's in interp->result */
+    /* else use what's in the interp result */
 
 	msg = Tcl_GetVar(interp,"errorInfo",TCL_GLOBAL_ONLY);
-	if (!msg) msg = interp->result;
+    if (!msg) msg = Tcl_GetStringResult (interp);
 	else if (check_for_nostack) {
 		/* suppress errorInfo if generated via */
 		/* error ... -nostack */
@@ -417,25 +417,25 @@ Tcl_Obj *eofObj;
 
 /*ARGSUSED*/
 int
-Exp_ExpVersionCmd(clientData, interp, argc, argv)
+Exp_ExpVersionObjCmd(clientData, interp, objc, objv)
 ClientData clientData;
 Tcl_Interp *interp;
-int argc;
-char **argv;
+     int objc;
+     Tcl_Obj *CONST objv[];		/* Argument objects. */
 {
 	int emajor, umajor;
 	char *user_version;	/* user-supplied version string */
 
-	if (argc == 1) {
+    if (objc == 1) {
 		Tcl_SetResult(interp,exp_version,TCL_STATIC);
 		return(TCL_OK);
 	}
-	if (argc > 3) {
+    if (objc > 3) {
 		exp_error(interp,"usage: expect_version [[-exit] version]");
 		return(TCL_ERROR);
 	}
 
-	user_version = argv[argc==2?1:2];
+    user_version = Tcl_GetString (objv[objc==2?1:2]);
 	emajor = atoi(exp_version);
 	umajor = atoi(user_version);
 
@@ -456,7 +456,7 @@ char **argv;
 		if (e >= u) return(TCL_OK);
 	}
 
-	if (argc == 2) {
+    if (objc == 2) {
 		exp_error(interp,"%s requires Expect version %s (but using %s)",
 			exp_argv0,user_version,exp_version);
 		return(TCL_ERROR);
@@ -500,17 +500,26 @@ Tcl_Interp *interp;
     Tcl_CmdInfo* return_info = NULL;
 
     if (first_time) {
+#ifndef USE_TCL_STUBS
 	int tcl_major = atoi(TCL_VERSION);
 	char *dot = strchr(TCL_VERSION,'.');
 	int tcl_minor = atoi(dot+1);
 
-#ifndef USE_TCL_STUBS
 	if (tcl_major < NEED_TCL_MAJOR || 
 	    (tcl_major == NEED_TCL_MAJOR && tcl_minor < NEED_TCL_MINOR)) {
-	    sprintf(interp->result,
-		    "%s compiled with Tcl %d.%d but needs at least Tcl %d.%d\n",
-		    exp_argv0,tcl_major,tcl_minor,
-		    NEED_TCL_MAJOR,NEED_TCL_MINOR);
+
+	    char bufa [20];
+	    char bufb [20];
+	    Tcl_Obj* s = Tcl_NewStringObj (exp_argv0,-1);
+
+	    sprintf(bufa,"%d.%d",tcl_major,tcl_minor);
+	    sprintf(bufb,"%d.%d",NEED_TCL_MAJOR,NEED_TCL_MINOR);
+
+	    Tcl_AppendStringsToObj (s,
+				    " compiled with Tcl ", bufa,
+				    " but needs at least Tcl ", bufb,
+				    "\n", NULL);
+	    Tcl_SetObjResult (interp, s);
 	    return TCL_ERROR;
 	}
 #endif
@@ -849,6 +858,27 @@ char **argv;
 	exp_interpret_rcfiles(interp,my_rc,sys_rc);
 }
 
+static void
+print_result (interp)
+     Tcl_Interp* interp;
+{
+    char* msg = Tcl_GetStringResult (interp);
+    if (msg[0] != 0) {
+	expErrorLogU(msg);
+	expErrorLogU("\r\n");
+    }
+}
+
+static void
+run_exit (interp)
+     Tcl_Interp* interp;
+{
+    /* SF #439042 -- Allow overide of "exit" by user / script
+     */
+    char buffer [] = "exit 1";
+    Tcl_Eval(interp, buffer); 
+}
+
 /* read rc files */
 void
 exp_interpret_rcfiles(interp,my_rc,sys_rc)
@@ -868,16 +898,8 @@ int sys_rc;
 		    expErrorLog("error executing system initialization file: %s\r\n",file);
 		    if (rc != TCL_ERROR)
 			expErrorLog("Tcl_Eval = %d\r\n",rc);
-		    if (*interp->result != 0) {
-			expErrorLogU(interp->result);
-			expErrorLogU("\r\n");
-		    }
-		    /* SF #439042 -- Allow overide of "exit" by user / script
-		     */
-		    {
-		      char buffer [] = "exit 1";
-		      Tcl_Eval(interp, buffer); 
-		    }
+		print_result (interp);
+		run_exit (interp);
 		}
 		close(fd);
 	    }
@@ -896,16 +918,8 @@ int sys_rc;
 			expErrorLog("error executing file: %s\r\n",file);
 			if (rc != TCL_ERROR)
 				expErrorLog("Tcl_Eval = %d\r\n",rc);
-			if (*interp->result != 0) {
-			    expErrorLogU(interp->result);
-			    expErrorLogU("\r\n");
-			}
-			/* SF #439042 -- Allow overide of "exit" by user / script
-			 */
-			{
-			  char buffer [] = "exit 1";
-			  Tcl_Eval(interp, buffer); 
-			}
+		    print_result (interp);
+		    run_exit (interp);
 		    }
 		    close(fd);
 	        }
@@ -976,9 +990,9 @@ FILE *fp;
 }
 
 static struct exp_cmd_data cmd_data[]  = {
-{"exp_version",	exp_proc(Exp_ExpVersionCmd),	0,	0},
-{"prompt1",	exp_proc(Exp_Prompt1Cmd),	0,	EXP_NOPREFIX},
-{"prompt2",	exp_proc(Exp_Prompt2Cmd),	0,	EXP_NOPREFIX},
+    {"exp_version", Exp_ExpVersionObjCmd, 0,	0,	0},
+    {"prompt1",	    Exp_Prompt1ObjCmd,    0,	0,	EXP_NOPREFIX},
+    {"prompt2",	    Exp_Prompt2ObjCmd,    0,	0,	EXP_NOPREFIX},
 {0}};
 
 void
@@ -987,3 +1001,11 @@ Tcl_Interp *interp;
 {
 	exp_create_commands(interp,cmd_data);
 }
+
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 4
+ * fill-column: 78
+ * End:
+ */
