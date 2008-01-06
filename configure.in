@@ -449,6 +449,7 @@ case "${host}" in
   *-*-sco3.2v[[45]]*)	stty_reads_stdout=1 ;;
   i[[3456]]86-*-sysv4.2MP)	stty_reads_stdout=0 ;;
   i[[3456]]86-*-linux*)	stty_reads_stdout=0 ;;
+  x86_64-*-linux*)	stty_reads_stdout=0 ;;
   # Not sure about old convex but 5.2 definitely reads from stdout
   c[[12]]-*-*)		stty_reads_stdout=1 ;;
   *-*-aix[[34]]*)	stty_reads_stdout=0 ;;
