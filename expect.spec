@@ -3,7 +3,7 @@
 
 Name: expect
 Version: 5.44
-Release: alt1
+Release: alt2
 Serial: 1
 
 Summary: A tcl extension for simplifying program-script interaction
@@ -13,14 +13,13 @@ Url: http://expect.nist.gov/
 
 Source0: %name-%version-%release.tar
 
-BuildRequires: tcl-devel >= 8.5.0-alt0.3
+BuildRequires: tcl-devel >= 8.5.0-alt1
 %if_with test
 BuildRequires(pre): /dev/pts
 BuildRequires(pre): /proc
 %endif
 
 Requires: tcl >= 8.5.0-alt0.3
-Requires: /dev/pts
 Requires: /proc
 
 %package devel
@@ -103,6 +102,10 @@ EOF
 %exclude %_man1dir/autoexpect.*
 
 %changelog
+* Sun Jan  6 2008 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.44-alt2
+- fixed build on x86_64
+- requirement on /dev/pts dropped
+
 * Sun Nov 25 2007 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.44-alt1
 - CVS snapshot @ 20070925
 - rebuilt with tcl8.5
