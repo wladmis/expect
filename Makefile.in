@@ -23,7 +23,7 @@
 SETUID = @SETUID@
 # SETUID = chmod u+s
 
-LIB_RUNTIME_DIR = $(INSTALL_ROOT)@libdir@
+LIB_RUNTIME_DIR = $(DESTDIR)@libdir@
 
 # The following Expect scripts are not necessary to have installed as
 # commands, but are very useful. Edit out what you don't want
