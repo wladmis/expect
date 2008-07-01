@@ -1,9 +1,9 @@
-%define uver .1.4
+%define uver .1.9
 %def_with test
 
 Name: expect
 Version: 5.44
-Release: alt2
+Release: alt3
 Serial: 1
 
 Summary: A tcl extension for simplifying program-script interaction
@@ -62,8 +62,7 @@ This package provides example programs found in expect bundle.
 %setup
 
 %build
-autoconf
-(cd testsuite && aclocal -I .. && autoconf)
+%autoreconf
 export ac_cv_c_tclconfig=%_libdir
 export ac_cv_c_tclh=%_includedir/tcl
 %configure
@@ -80,7 +79,7 @@ package ifneeded Expect %version%uver [list load [file join \$dir .. .. .. %_lib
 EOF
 
 %files
-%doc FAQ NEWS README
+%doc FAQ NEWS README ChangeLog
 %_bindir/expect
 %_bindir/autoexpect
 %_libdir/lib%name%version%uver.so
@@ -102,6 +101,9 @@ EOF
 %exclude %_man1dir/autoexpect.*
 
 %changelog
+* Tue Jul  1 2008 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.44-alt3
+- CVS snapshot @ 20080604
+
 * Sun Jan  6 2008 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.44-alt2
 - fixed build on x86_64
 - requirement on /dev/pts dropped
