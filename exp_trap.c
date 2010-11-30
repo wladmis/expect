@@ -17,6 +17,9 @@ would appreciate credit if this program or parts of it are used.
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
 
 #if defined(SIGCLD) && !defined(SIGCHLD)
 #define SIGCHLD SIGCLD
@@ -122,7 +125,7 @@ int code;
 	if (trap->interp) {
 		/* if trap requested original interp, use it */
 		sig_interp = trap->interp;
-	} else if (!interp) {
+	} else if (interp) {
 		/* else if another interp is available, use it */
 		sig_interp = interp;
 	} else {

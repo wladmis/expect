@@ -23,6 +23,7 @@ if {[regexp {^#!(?:.*/)*([^ ]+)} [gets stdin] {} interp]} {
 	}
 	expect {}
 	tclsh { exit 0 }
+	sh { exit 0 }
 	default {
 	    error "FIXME: $interp"
 	}

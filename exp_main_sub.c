@@ -33,7 +33,7 @@
 #endif
 #ifdef __CENTERLINE__
 #undef	EXP_VERSION
-#define	EXP_VERSION		"5.43.0"		/* I give up! */
+#define	EXP_VERSION		"5.45.0"		/* I give up! */
 					/* It is not necessary that number */
 					/* be accurate.  It is just here to */
 					/* pacify Centerline which doesn't */
@@ -281,14 +281,18 @@ Tcl_Obj *eofObj;
     Tcl_Channel inChannel, outChannel;
     ExpState *esPtr = expStdinoutGet();
     /*	int fd = fileno(stdin);*/
-	
-    expect_key++;
 
+    expect_key++;
     commandPtr = Tcl_NewObj();
     Tcl_IncrRefCount(commandPtr);
 
     gotPartial = 0;
     while (TRUE) {
+	if (Tcl_IsShared(commandPtr)) {
+	    Tcl_DecrRefCount(commandPtr);
+	    commandPtr = Tcl_DuplicateObj(commandPtr);
+	    Tcl_IncrRefCount(commandPtr);
+	}
 	outChannel = expStdinoutGet()->channel;
 	if (outChannel) {
 	    Tcl_Flush(outChannel);
@@ -358,11 +362,16 @@ Tcl_Obj *eofObj;
          * Add the newline removed by Tcl_GetsObj back to the string.
          */
 
+	if (Tcl_IsShared(commandPtr)) {
+	    Tcl_DecrRefCount(commandPtr);
+	    commandPtr = Tcl_DuplicateObj(commandPtr);
+	    Tcl_IncrRefCount(commandPtr);
+	}
 	Tcl_AppendToObj(commandPtr, "\n", 1);
 	if (!TclObjCommandComplete(commandPtr)) {
 	    gotPartial = 1;
 	    continue;
-	}	
+	}
 
 	Tcl_AppendToObj(commandPtr, "\n", 1);
 	if (!TclObjCommandComplete(commandPtr)) {
@@ -375,7 +384,9 @@ Tcl_Obj *eofObj;
 	if (tty_changed) exp_tty_set(interp,&tty_old,was_raw,was_echo);
 
 	code = Tcl_RecordAndEvalObj(interp, commandPtr, 0);
-	Tcl_SetObjLength(commandPtr, 0);
+	Tcl_DecrRefCount(commandPtr);
+	commandPtr = Tcl_NewObj();
+	Tcl_IncrRefCount(commandPtr);
 	switch (code) {
 	    char *str;
 
@@ -470,7 +481,8 @@ Tcl_Interp *interp;
 	  char buffer [] = "exit 1";
 	  Tcl_Eval(interp, buffer); 
 	}
-	/*NOTREACHED*/
+	/*NOTREACHED, but keep compiler from complaining*/
+	return TCL_ERROR;
 }
 
 static char init_auto_path[] = "\

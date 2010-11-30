@@ -724,19 +724,23 @@ struct eval_out {
 Tcl_UniChar *
 string_case_first(	/* INTL */
     register Tcl_UniChar *string,	/* String (unicode). */
+    int length,                         /* length of above string */
     register char *pattern)	/* Pattern, which may contain
 				 * special characters (utf8). */
 {
     Tcl_UniChar *s;
     char *p;
     int offset;
+    register int consumed = 0;
     Tcl_UniChar ch1, ch2;
-    
-    while (*string != 0) {
+    Tcl_UniChar *bufend = string + length;
+
+    while ((*string != 0) && (string < bufend)) {
 	s = string;
 	p = pattern;
-	while (*s) {
+        while ((*s) && (s < bufend)) {
 	    ch1 = *s++;
+            consumed++;
 	    offset = TclUtfToUniChar(p, &ch2);
 	    if (Tcl_UniCharToLower(ch1) != Tcl_UniCharToLower(ch2)) {
 		break;
@@ -747,36 +751,42 @@ string_case_first(	/* INTL */
 	    return string;
 	}
 	string++;
+        consumed++;
     }
     return NULL;
 }
 
 Tcl_UniChar *
 string_first(	/* INTL */
-    register Tcl_UniChar *string,	/* String (unicode). */
-    register char *pattern)	/* Pattern, which may contain
-				 * special characters (utf8). */
+    register Tcl_UniChar *string,       /* String (unicode). */
+    int length,                         /* length of above string */
+    register char *pattern)             /* Pattern, which may contain
+                                         * special characters (utf8). */
 {
     Tcl_UniChar *s;
     char *p;
     int offset;
+    register int consumed = 0;
     Tcl_UniChar ch1, ch2;
+    Tcl_UniChar *bufend = string + length;
     
-    while (*string != 0) {
+    while ((*string != 0) && (string < bufend)) {
 	s = string;
 	p = pattern;
-	while (*s) {
+        while ((*s) && (s < bufend)) {
 	    ch1 = *s++;
+            consumed++;
 	    offset = TclUtfToUniChar(p, &ch2);
 	    if (ch1 != ch2) {
 		break;
 	    }
 	    p += offset;
 	}
-	if (*p == '\0') {
+        if (*p == '\0') {
 	    return string;
 	}
-	string++;
+        string++;
+        consumed++;
     }
     return NULL;
 }
@@ -927,15 +937,18 @@ eval_case_string(
 	Tcl_UniChar *p;
 
 	if (e->Case == CASE_NORM) {
-	    p = string_first(str, pat); /* NEW function in this file, see above */
+	    p = string_first(str, numchars, pat); /* NEW function in this file, see above */
 	} else {
-	    p = string_case_first(str, pat);
+	    p = string_case_first(str, numchars, pat);
 	}	    
 
 	expDiagLog("\"");
 	expDiagLogU(expPrintify(Tcl_GetString(e->pat)));
 	expDiagLog("\"? ");
 	if (p) {
+	    /* Bug 3095935. Go from #bytes to #chars */
+	    patLength = Tcl_NumUtfChars (pat, patLength);
+
 	    e->simple_start = p - str;
 	    o->e = e;
 	    o->matchlen = patLength;
@@ -2334,7 +2347,7 @@ expMatchProcess(
 	}
     }
 
-    /* this is broken out of (match > 0) (above) since it can */
+    /* this is broken out of (match > 0) (above) since it can be */
     /* that an EOF occurred with match == 0 */
     if (eo->esPtr) {
 	Tcl_UniChar *str;

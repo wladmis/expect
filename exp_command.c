@@ -728,7 +728,7 @@ Exp_SpawnObjCmd(
 		}
 		sig = exp_string_to_signal(interp,Tcl_GetString (objv[i]));
 		if (sig == -1) {
-		    exp_error(interp,"usage: -ignore %s: unknown signal name",objv[i]);
+		    exp_error(interp,"usage: -ignore %s: unknown signal name",Tcl_GetString (objv[i]));
 		    return TCL_ERROR;
 		}
 		ignore[sig] = TRUE;
@@ -1095,7 +1095,7 @@ Exp_SpawnObjCmd(
 		/* hand set errno */
 		errno = child_errno;
 		exp_error(interp, "couldn't execute \"%s\": %s",
-			objv[0],Tcl_PosixError(interp));
+			command,Tcl_PosixError(interp));
 		goto parent_error;
 	}
 	close(status_pipe[0]);
@@ -2237,7 +2237,7 @@ Exp_LogFileObjCmd(
     
     if (i == (objc - 1)) {
 	filename = Tcl_GetString (objv[i]);
-    } else if (objc > 1) {
+    } else if (objc > i) {
 	/* too many arguments */
 	goto usage_error;
     } 
@@ -3225,7 +3225,7 @@ Exp_OverlayObjCmd(
     int newfd, oldfd;
     int dash_name = 0;
     char *command;
-    int k;
+    int k, j;
     char **argv;
 
     int i;
@@ -3265,25 +3265,29 @@ Exp_OverlayObjCmd(
 	return(TCL_ERROR);
     }
 
-    /* convert to string array for execvp */
+    /* convert to string array for execvp.
+     * Take only the arguments after the command name (i+1 ...). The arguments
+     * before are arguments of overlay, not of the invoked command. The
+     * command name is at index.
+     */
 
     argv = (char**) ckalloc ((objc+1)*sizeof(char*));
 
-    for (k=1;k<objc;k++) {
-	argv[k] = ckalloc (1+strlen(Tcl_GetString (objv[k])));
-	strcpy (argv[k],Tcl_GetString (objv[k]));
+    for (k=i+1,j=1;k<objc;k++,j++) {
+	argv[j] = ckalloc (1+strlen(Tcl_GetString (objv[k])));
+	strcpy (argv[j],Tcl_GetString (objv[k]));
     }
-    argv[objc] = NULL;
+    argv[j] = NULL;
 
     /* command, handle '-' */
-    argv[0] = ckalloc (2+strlen(Tcl_GetString (objv[0])));
+    command = Tcl_GetString (objv[i]);
+    argv[0] = ckalloc (2+strlen(command));
     if (dash_name) {
 	argv [0][0] = '-';
-	strcpy (argv[0]+1,Tcl_GetString (objv[0]));
+	strcpy (argv[0]+1,command);
     } else {
-	strcpy (argv[0],Tcl_GetString (objv[0]));
+	strcpy (argv[0],command);
     }
-    command = Tcl_GetString (objv[0]);
 
     signal(SIGINT, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
