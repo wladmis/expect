@@ -1,6 +1,6 @@
 Name: expect
 Version: 5.45
-Release: alt1
+Release: alt2
 Serial: 1
 
 Summary: A tcl extension for simplifying program-script interaction
@@ -97,8 +97,11 @@ EOF
 %exclude %_man1dir/autoexpect.*
 
 %changelog
-* Tue Nov 30 2010 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.45-alt1
+* Tue Nov 30 2010 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.45-alt2
 - 5.45 released
+
+* Tue Jul  1 2008 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.44-alt3
+- CVS snapshot @ 20080604
 
 * Sun Jan  6 2008 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.44-alt2
 - fixed build on x86_64
