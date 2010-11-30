@@ -1,9 +1,6 @@
-%define uver .1.9
-%def_with test
-
 Name: expect
-Version: 5.44
-Release: alt3
+Version: 5.45
+Release: alt1
 Serial: 1
 
 Summary: A tcl extension for simplifying program-script interaction
@@ -14,10 +11,8 @@ Url: http://expect.nist.gov/
 Source0: %name-%version-%release.tar
 
 BuildRequires: tcl-devel >= 8.5.0-alt1
-%if_with test
 BuildRequires(pre): /dev/pts
 BuildRequires(pre): /proc
-%endif
 
 Requires: tcl >= 8.5.0-alt0.3
 Requires: /proc
@@ -62,27 +57,28 @@ This package provides example programs found in expect bundle.
 %setup
 
 %build
-%autoreconf
+autoconf
+(cd testsuite && aclocal -I .. && autoconf)
 export ac_cv_c_tclconfig=%_libdir
 export ac_cv_c_tclh=%_includedir/tcl
-%configure
-%make_build all %{?_with_test: test}
+%configure --disable-rpath
+%make_build all test
 
 %install
 %make_install DESTDIR=%buildroot install
-mv %buildroot%_libdir/%name%version%uver/lib%name%version%uver.so %buildroot%_libdir
-ln -sf lib%name%version%uver.so %buildroot%_libdir/lib%name.so
-rm -rf %buildroot%_libdir/%name%version%uver
+mv %buildroot%_libdir/%name%version/lib%name%version.so %buildroot%_libdir
+ln -sf lib%name%version.so %buildroot%_libdir/lib%name.so
+rm -rf %buildroot%_libdir/%name%version
 mkdir -p -m0755 %buildroot%_tcldatadir/%name%version
 cat <<EOF > %buildroot%_tcldatadir/%name%version/pkgIndex.tcl
-package ifneeded Expect %version%uver [list load [file join \$dir .. .. .. %_lib lib%name%version%uver.so]]
+package ifneeded Expect %version [list load [file join \$dir .. .. .. %_lib lib%name%version.so]]
 EOF
 
 %files
-%doc FAQ NEWS README ChangeLog
+%doc FAQ NEWS README
 %_bindir/expect
 %_bindir/autoexpect
-%_libdir/lib%name%version%uver.so
+%_libdir/lib%name%version.so
 %_tcldatadir/%name%version
 %_man1dir/expect.*
 %_man1dir/autoexpect.*
@@ -101,8 +97,8 @@ EOF
 %exclude %_man1dir/autoexpect.*
 
 %changelog
-* Tue Jul  1 2008 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.44-alt3
-- CVS snapshot @ 20080604
+* Tue Nov 30 2010 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.45-alt1
+- 5.45 released
 
 * Sun Jan  6 2008 Sergey Bolshakov <sbolshakov@altlinux.ru> 1:5.44-alt2
 - fixed build on x86_64
