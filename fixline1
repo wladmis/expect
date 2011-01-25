@@ -1,10 +1,8 @@
-#!/usr/bin/tclsh
-# -*- tcl -*-
+#!expect --
 # Synopsis: fixline1 newpath < input > output
 # Author: Don Libes
-# Modified by: Sergey Bolshakov <sbolshakov@altlinux.ru>
-# Description: change first line of script to load expect as tcl package
 
+# Description: change first line of script to reflect new binary
 # try to match any of the following first lines
 #!expect ...
 #!../expect ...
@@ -12,22 +10,16 @@
 #!foo/bar/expectk ...
 #!/bin/sh ...  (beginning of multiline #! style)
 #
+set line1 [gets stdin]
+if {"$line1" == "\#!/bin/sh"} {
+    # if multi-line hack already in place, do nothing
+    set header $line1
+} else {
+    # if single-line #!, switch to multi-line rewrite
 
-set line1 "#!/usr/bin/tclsh"
-set with_tk {}
-
-if {[regexp {^#!(?:.*/)*([^ ]+)} [gets stdin] {} interp]} {
-    switch -exact -- $interp {
-	expectk {
-	    set with_tk {package require Tk}
-	}
-	expect {}
-	tclsh { exit 0 }
-	sh { exit 0 }
-	default {
-	    error "FIXME: $interp"
-	}
-    }
+    regexp "^#!(.*/)*(.*)" $line1 X X tail
+    set header "#!/bin/sh\n"
+    append header "# \\\n"
+    append header "exec $tail "; append header {"$0" ${1+"$@"}}
 }
-
-puts -nonewline "$line1\npackage require Expect\n$with_tk\n[read stdin]"
+puts -nonewline "$header\n[read stdin]"
