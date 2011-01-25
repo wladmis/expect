@@ -1,4 +1,8 @@
-#!/usr/bin/tclsh
+#!/bin/sh
+# -*- tcl -*-
+# The next line is executed by /bin/sh, but not tcl \
+exec tclsh "$0" ${1+"$@"}
+
 # $Id: autopasswd.expect,v 1.6 1999/08/27 19:39:18 moniot Exp $
 # Wrapper to run passwd(1) non-interactively
 #  Usage:  autopasswd username password
