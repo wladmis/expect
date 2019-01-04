@@ -2,3 +2,4 @@ tar: . name=@name@-@version@-@release@ base=@name@-@version@
 copy: alt/made-armh-arch-known.patch
 copy: alt/avoid-using-fixline1-from-now.patch
 copy: alt/use-shebang-trick-like-other-examples.patch
+copy: alt/do-not-fix-script-if-it-ain-t-broken.patch

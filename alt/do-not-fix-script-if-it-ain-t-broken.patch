@@ -1,0 +1,14 @@
+
+diff --git a/fixline1 b/fixline1
+index 81e8a02..26f6553 100755
+--- a/fixline1
++++ b/fixline1
+@@ -22,6 +22,8 @@ if {[regexp {^#!(?:.*/)*([^ ]+)} [gets stdin] {} interp]} {
+ 	    set with_tk {package require Tk}
+ 	}
+ 	expect {}
++	tclsh { exit 0 }
++	sh { exit 0 }
+ 	default {
+ 	    error "FIXME: $interp"
+ 	}

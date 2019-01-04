@@ -22,8 +22,6 @@ if {[regexp {^#!(?:.*/)*([^ ]+)} [gets stdin] {} interp]} {
 	    set with_tk {package require Tk}
 	}
 	expect {}
-	tclsh { exit 0 }
-	sh { exit 0 }
 	default {
 	    error "FIXME: $interp"
 	}

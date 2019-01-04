@@ -9,9 +9,10 @@ Group: Development/Tcl
 Url: http://expect.nist.gov/
 
 Source0: %name-%version-%release.tar
-Patch1: use-shebang-trick-like-other-examples.patch
-Patch2: avoid-using-fixline1-from-now.patch
-Patch3: made-armh-arch-known.patch
+Patch1: do-not-fix-script-if-it-ain-t-broken.patch
+Patch2: use-shebang-trick-like-other-examples.patch
+Patch3: avoid-using-fixline1-from-now.patch
+Patch4: made-armh-arch-known.patch
 
 BuildRequires: tcl-devel >= 8.5.0-alt1
 BuildRequires(pre): /dev/pts
@@ -61,6 +62,7 @@ This package provides example programs found in expect bundle.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 autoconf
