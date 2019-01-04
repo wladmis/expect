@@ -9,6 +9,7 @@ Group: Development/Tcl
 Url: http://expect.nist.gov/
 
 Source0: %name-%version-%release.tar
+Patch1: made-armh-arch-known.patch
 
 BuildRequires: tcl-devel >= 8.5.0-alt1
 BuildRequires(pre): /dev/pts
@@ -55,6 +56,7 @@ This package provides example programs found in expect bundle.
 
 %prep
 %setup
+%patch1 -p1
 
 %build
 autoconf
