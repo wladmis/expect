@@ -1,0 +1,21 @@
+
+diff --git a/fixcat b/fixcat
+index 7a538cf..befbeaf 100755
+--- a/fixcat
++++ b/fixcat
+@@ -8,14 +8,5 @@
+ # If this file is sitting in an architecture-specific library directory,
+ # then it serves as a marker that your /bin/cat buffers by default.
+ 
+-# test for when catting to/from files
+-log_user 0
+-spawn -open [open "|cat" "r+"]
+-send "\r"
+-expect "\r" {exit 1}
++exit 0
+ 
+-# test for when catting to real tty
+-#log_user 0
+-#spawn /bin/cat
+-#send "\r"
+-#expect "\r\n\r\n" {exit 1}
