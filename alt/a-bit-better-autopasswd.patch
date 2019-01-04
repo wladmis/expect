@@ -1,20 +1,13 @@
 
 diff --git a/example/autopasswd b/example/autopasswd
-index 1527c99..47e925e 100755
+index 1d095e2..47e925e 100755
 --- a/example/autopasswd
 +++ b/example/autopasswd
-@@ -1,11 +1,50 @@
--#!../expect -f
--# wrapper to make passwd(1) be non-interactive
--# username is passed as 1st arg, passwd as 2nd
--
--set password [lindex $argv 1]
--spawn passwd [lindex $argv 0]
--expect "assword:"
--send -- "$password\r"
--expect "assword:"
--send -- "$password\r"
--expect eof
+@@ -1,17 +1,50 @@
+-#!/bin/sh
+-# -*- tcl -*-
+-# The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
 +#!/usr/bin/tclsh
 +# $Id: autopasswd.expect,v 1.6 1999/08/27 19:39:18 moniot Exp $
 +# Wrapper to run passwd(1) non-interactively
@@ -24,11 +17,20 @@ index 1527c99..47e925e 100755
 +#
 +#  Author: R. Moniot, based on simpler version found in expect distribution
 +#  Date:   27 August 1999
-+
-+package require Expect
-+
+ 
+ package require Expect
+ 
+-# wrapper to make passwd(1) be non-interactive
+-# username is passed as 1st arg, passwd as 2nd
 +if "$argc > 0" {
-+
+ 
+-set password [lindex $argv 1]
+-spawn passwd [lindex $argv 0]
+-expect "assword:"
+-send -- "$password\r"
+-expect "assword:"
+-send -- "$password\r"
+-expect eof
 +#  Get username and password from commandline if present.
 +
 +    set username	[lindex $argv 0]

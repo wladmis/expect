@@ -1,11 +1,2 @@
 tar: . name=@name@-@version@-@release@ base=@name@-@version@
-copy: alt/made-armh-arch-known.patch
-copy: alt/avoid-using-fixline1-from-now.patch
-copy: alt/use-shebang-trick-like-other-examples.patch
-copy: alt/do-not-fix-script-if-it-ain-t-broken.patch
-copy: alt/a-bit-better-autopasswd.patch
-copy: alt/expect-5.43-alt-tests.patch
-copy: alt/expect-5.43-alt-fixline.patch
-copy: alt/expect-5.39-rh-fixcat.patch
-copy: alt/expect-5.38-rh-rftp.patch
-copy: alt/expect-5.38-rh-mkpasswd.patch
+copy: alt/*
