@@ -1,0 +1,67 @@
+
+diff --git a/example/autopasswd b/example/autopasswd
+index 1527c99..47e925e 100755
+--- a/example/autopasswd
++++ b/example/autopasswd
+@@ -1,11 +1,50 @@
+-#!../expect -f
+-# wrapper to make passwd(1) be non-interactive
+-# username is passed as 1st arg, passwd as 2nd
+-
+-set password [lindex $argv 1]
+-spawn passwd [lindex $argv 0]
+-expect "assword:"
+-send -- "$password\r"
+-expect "assword:"
+-send -- "$password\r"
+-expect eof
++#!/usr/bin/tclsh
++# $Id: autopasswd.expect,v 1.6 1999/08/27 19:39:18 moniot Exp $
++# Wrapper to run passwd(1) non-interactively
++#  Usage:  autopasswd username password
++#    or    echo " username password" | autopasswd
++#  Returns code 0 if successful, nonzero otherwise (bad password)
++#
++#  Author: R. Moniot, based on simpler version found in expect distribution
++#  Date:   27 August 1999
++
++package require Expect
++
++if "$argc > 0" {
++
++#  Get username and password from commandline if present.
++
++    set username	[lindex $argv 0]
++    set password	[lindex $argv 1]
++} else {
++
++#  Otherwise read username and password from stdin: they must be separated
++#  by exactly one blank space and contain no blanks themselves.
++
++    expect_user {
++	-re "(.*) (.*)" {
++	    set username $expect_out(1,string);
++	    set password $expect_out(2,string)
++	}
++    }
++}
++
++spawn passwd $username
++
++# The sleep is needed to give passwd time to get ready.
++expect {
++    "password:"		{ sleep 1; send -- "$password\r" }	# send
++}
++
++expect {
++    "BAD PASSWORD:*"	{ exit 1 }
++    "password:"		{ sleep 1; send -- "$password\r" }	# resend
++}
++
++expect {
++    "successfully"	{ exit 0 }			# OK (Linux flavor)
++    eof			{ exit 0 }			# OK (AIX flavor)
++    timeout		{ exit 2 }			# something went wrong
++}
++
++exit 0
