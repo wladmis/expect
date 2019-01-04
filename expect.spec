@@ -35,6 +35,25 @@ Patch109: 28-cross.patch
 # modified to adapt to ALT: suggest tk package instead of tk8.6
 Patch110: 29-suggest-tk.patch
 
+# Fedora patches
+Patch200: expect-5.45-mkpasswd-man.patch
+Patch201: expect-5.45-passmass-su-full-path.patch
+Patch202: expect-5.45-check-telnet.patch
+# rediffed to apply with ALT patches
+Patch203: expect-5.45-mkpasswd-dash.patch
+Patch204: expect-5.45.4-covscan-fixes.patch
+Patch205: expect-5.45.4-unification-of-usage-and-man-page.patch
+# applied expect-5.45-fd-leak.patch instead of Debian
+# 07-file-handle.patch
+Patch206: expect-5.45-fd-leak.patch
+# applied expect-5.45-segfault-with-stubs.patch instead of Debian
+# 22-segfault-with-stubs.patch
+Patch207: expect-5.45-segfault-with-stubs.patch
+Patch208: expect-5.45-exp-log-buf-overflow.patch
+Patch209: expect-5.45-re-memleak.patch
+Patch210: expect-5.45-match-gt-numchars-segfault.patch
+Patch211: expect-5.45-man-page.patch
+
 BuildRequires: tcl-devel >= 8.5.0-alt1
 BuildRequires(pre): /dev/pts
 BuildRequires(pre): /proc
@@ -102,6 +121,19 @@ This package provides example programs found in expect bundle.
 %patch108 -p1
 %patch109 -p1
 %patch110 -p1
+
+%patch200 -p1
+%patch201 -p1
+%patch202 -p1
+%patch203 -p1
+%patch204 -p1
+%patch205 -p1
+%patch206 -p1
+%patch207 -p1
+%patch208 -p1
+%patch209 -p1
+%patch210 -p1
+%patch211 -p1
 
 %build
 autoconf

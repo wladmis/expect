@@ -1,0 +1,15 @@
+
+diff --git a/example/mkpasswd b/example/mkpasswd
+index 5e449df..461c554 100755
+--- a/example/mkpasswd
++++ b/example/mkpasswd
+@@ -201,7 +201,8 @@ if {[info exists user]} {
+ 		"assword*:" {
+ 			# some systems say "Password (again):"
+ 			sleep .5s
+-			send "$password\r"
++			send -- "$password\r"
++			# "--" because of passwords beginning with dash
+ 			exp_continue
+ 		}
+ 	}
