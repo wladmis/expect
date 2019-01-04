@@ -9,15 +9,16 @@ Group: Development/Tcl
 Url: http://expect.nist.gov/
 
 Source0: %name-%version-%release.tar
-Patch1: expect-5.38-rh-rftp.patch
-Patch2: expect-5.39-rh-fixcat.patch
-Patch3: expect-5.43-alt-fixline.patch
-Patch4: expect-5.43-alt-tests.patch
-Patch5: a-bit-better-autopasswd.patch
-Patch6: do-not-fix-script-if-it-ain-t-broken.patch
-Patch7: use-shebang-trick-like-other-examples.patch
-Patch8: avoid-using-fixline1-from-now.patch
-Patch9: made-armh-arch-known.patch
+Patch1: expect-5.38-rh-mkpasswd.patch
+Patch2: expect-5.38-rh-rftp.patch
+Patch3: expect-5.39-rh-fixcat.patch
+Patch4: expect-5.43-alt-fixline.patch
+Patch5: expect-5.43-alt-tests.patch
+Patch6: a-bit-better-autopasswd.patch
+Patch7: do-not-fix-script-if-it-ain-t-broken.patch
+Patch8: use-shebang-trick-like-other-examples.patch
+Patch9: avoid-using-fixline1-from-now.patch
+Patch10: made-armh-arch-known.patch
 
 BuildRequires: tcl-devel >= 8.5.0-alt1
 BuildRequires(pre): /dev/pts
@@ -73,6 +74,7 @@ This package provides example programs found in expect bundle.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
+%patch10 -p1
 
 %build
 autoconf

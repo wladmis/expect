@@ -8,3 +8,4 @@ copy: alt/expect-5.43-alt-tests.patch
 copy: alt/expect-5.43-alt-fixline.patch
 copy: alt/expect-5.39-rh-fixcat.patch
 copy: alt/expect-5.38-rh-rftp.patch
+copy: alt/expect-5.38-rh-mkpasswd.patch

@@ -1,0 +1,27 @@
+
+diff --git a/example/mkpasswd b/example/mkpasswd
+index d532d10..b43ccf3 100755
+--- a/example/mkpasswd
++++ b/example/mkpasswd
+@@ -92,7 +92,12 @@ proc insert {pvar char} {
+ }
+ 
+ proc rand {m} {
+-    expr {int($m*rand())}
++    set device /dev/urandom		;# /dev/random can block
++    set fileId [open $device r]
++    binary scan [read $fileId 4] i1 number
++    set clipped [expr $number % $m]
++    close $fileId
++    return $clipped
+ }
+ 
+ # choose left or right starting hand
+@@ -188,6 +193,7 @@ if {[info exists user]} {
+ 	expect {
+ 		"assword*:" {
+ 			# some systems say "Password (again):"
++			sleep .5s
+ 			send "$password\r"
+ 			exp_continue
+ 		}
