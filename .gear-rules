@@ -1,4 +1,4 @@
-tar: . name=@name@-@version@-@release@ base=@name@-@version@
+tar: . name=@name@-@version@ base=@name@-@version@
 copy: alt/*
 copy: debian/*
 copy: fedora/*

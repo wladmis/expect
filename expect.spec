@@ -1,14 +1,15 @@
 Name: expect
-Version: 5.45
-Release: alt4.qa1
+Version: 5.45.4
+Release: alt1
 Serial: 1
 
 Summary: A tcl extension for simplifying program-script interaction
 License: BSD
 Group: Development/Tcl
-Url: http://expect.nist.gov/
+Url: http://core.tcl.tk/expect
 
-Source0: %name-%version-%release.tar
+# fossil export
+Source0: %name-%version.tar
 # ALT patches
 Patch1: expect-5.38-rh-mkpasswd.patch
 Patch2: expect-5.38-rh-rftp.patch
@@ -138,7 +139,7 @@ autoconf
 export ac_cv_c_tclconfig=%_libdir
 export ac_cv_c_tclh=%_includedir/tcl
 %configure --disable-rpath
-%make_build all test
+%make_build all
 
 %install
 %make_install DESTDIR=%buildroot install
@@ -149,6 +150,9 @@ mkdir -p -m0755 %buildroot%_tcldatadir/%name%version
 cat <<EOF > %buildroot%_tcldatadir/%name%version/pkgIndex.tcl
 package ifneeded Expect %version [list load [file join \$dir .. .. .. %_lib lib%name%version.so]]
 EOF
+
+%check
+make test
 
 %files
 %doc FAQ NEWS README
@@ -173,6 +177,13 @@ EOF
 %exclude %_man1dir/autoexpect.*
 
 %changelog
+* Fri Jan 04 2019 Vladimir D. Seleznev <vseleznv@altlinux.org> 1:5.45.4-alt1
+- 5.45.4 released;
+- rediffed ALT patches;
+- applied nice Debian and Fedora patches;
+- moved make test to %%check section;
+- new upstream url.
+
 * Wed Mar 22 2017 Vladimir D. Seleznev <vseleznv@altlinux.org> 1:5.45-alt4.qa1
 - NMU: rebuild against Tcl/Tk 8.6
 
