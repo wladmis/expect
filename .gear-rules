@@ -1,2 +1,3 @@
 tar: . name=@name@-@version@-@release@ base=@name@-@version@
 copy: alt/*
+copy: debian/*
