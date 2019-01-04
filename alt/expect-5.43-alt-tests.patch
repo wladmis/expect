@@ -1,0 +1,14 @@
+
+diff --git a/Makefile.in b/Makefile.in
+index 7223b5b..2e4527c 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -266,7 +266,7 @@ install-doc: doc
+ 	done
+ 
+ test: binaries libraries
+-	$(TCLSH) `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS)
++	echo "load $(PKG_LIB_FILE); source [file join $(srcdir) tests all.tcl]" | $(TCLSH)
+ 
+ shell: binaries libraries
+ 	@$(TCLSH) $(SCRIPT)
