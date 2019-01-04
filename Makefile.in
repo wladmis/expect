@@ -380,7 +380,7 @@ dist: dist-clean doc
 	cp $(DIST_ROOT)/$(PKG_DIR).tar.gz $(top_builddir)
 
 $(SCRIPTS):
-	@cp -pf $(srcdir)/example/$@ $@
+	$(TCLSH) $(srcdir)/fixline1 $(SHORT_BINDIR) < $(srcdir)/example/$@ > $@
 
 ## We cannot use TCL_LIBS below (after TCL_LIB_SPEC) because its
 ## expansion references the contents of LIBS, which contains linker
