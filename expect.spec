@@ -9,6 +9,7 @@ Group: Development/Tcl
 Url: http://expect.nist.gov/
 
 Source0: %name-%version-%release.tar
+# ALT patches
 Patch1: expect-5.38-rh-mkpasswd.patch
 Patch2: expect-5.38-rh-rftp.patch
 Patch3: expect-5.39-rh-fixcat.patch
@@ -19,6 +20,18 @@ Patch7: do-not-fix-script-if-it-ain-t-broken.patch
 Patch8: use-shebang-trick-like-other-examples.patch
 Patch9: avoid-using-fixline1-from-now.patch
 Patch10: made-armh-arch-known.patch
+
+# Debian patches
+Patch100: 01-example-shebang.patch
+Patch101: 06-pkgindex.patch
+Patch102: 09-unsafe-traps.patch
+Patch103: 10-manpage.patch
+Patch104: 11-ttyname.patch
+Patch105: 12-fdout.patch
+Patch106: 13-implicit-defs.patch
+Patch107: 16-logfile.patch
+Patch108: 24-format.patch
+Patch109: 28-cross.patch
 
 BuildRequires: tcl-devel >= 8.5.0-alt1
 BuildRequires(pre): /dev/pts
@@ -75,6 +88,17 @@ This package provides example programs found in expect bundle.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+
+%patch100 -p1
+%patch101 -p1
+%patch102 -p1
+%patch103 -p1
+%patch104 -p1
+%patch105 -p1
+%patch106 -p1
+%patch107 -p1
+%patch108 -p1
+%patch109 -p1
 
 %build
 autoconf
