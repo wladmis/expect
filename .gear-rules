@@ -5,3 +5,4 @@ copy: alt/use-shebang-trick-like-other-examples.patch
 copy: alt/do-not-fix-script-if-it-ain-t-broken.patch
 copy: alt/a-bit-better-autopasswd.patch
 copy: alt/expect-5.43-alt-tests.patch
+copy: alt/expect-5.43-alt-fixline.patch
