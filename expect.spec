@@ -70,6 +70,8 @@ Summary: Example applications using Expect
 BuildArch: noarch
 Group: Development/Tcl
 Requires: %name = %serial:%version-%release tcl(Tk)
+# filename collision
+Conflicts: mkpasswd
 
 %description
 Expect is a tcl extension for automating interactive applications such
