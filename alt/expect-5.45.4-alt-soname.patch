@@ -1,0 +1,13 @@
+diff --git a/tclconfig/tcl.m4 b/tclconfig/tcl.m4
+index 0689cab..49afea8 100644
+--- a/tclconfig/tcl.m4
++++ b/tclconfig/tcl.m4
+@@ -1530,7 +1530,7 @@ dnl AC_CHECK_TOOL(AR, ar)
+ 
+ 	    # TEA specific: use LDFLAGS_DEFAULT instead of LDFLAGS
+ 	    SHLIB_LD='${CC} -shared ${CFLAGS} ${LDFLAGS_DEFAULT}'
+-	    LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
++	    LDFLAGS="$LDFLAGS -Wl,--export-dynamic,-soname,\${@}"
+ 	    AS_IF([test $doRpath = yes], [
+ 		CC_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'])
+ 	    LD_SEARCH_FLAGS=${CC_SEARCH_FLAGS}

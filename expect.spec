@@ -22,6 +22,7 @@ Patch8: use-shebang-trick-like-other-examples.patch
 Patch9: avoid-using-fixline1-from-now.patch
 Patch10: made-armh-arch-known.patch
 Patch11: expect-5.45.4-alt-remove-ieee-linkage.patch
+Patch12: expect-5.45.4-alt-soname.patch
 
 # Debian patches
 Patch100: 01-example-shebang.patch
@@ -113,6 +114,7 @@ This package provides example programs found in expect bundle.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
 
 %patch100 -p1
 %patch101 -p1
