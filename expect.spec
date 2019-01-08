@@ -1,6 +1,6 @@
 Name: expect
 Version: 5.45.4
-Release: alt2
+Release: alt3
 Serial: 1
 
 Summary: A tcl extension for simplifying program-script interaction
@@ -184,6 +184,11 @@ make test
 %exclude %_man1dir/autoexpect.*
 
 %changelog
+* Mon Jan 07 2019 Vladimir D. Seleznev <vseleznv@altlinux.org> 1:5.45.4-alt3
+- added conflict to expect-examples subpackage with mkpasswd;
+- removed -lieee again;
+- built library with SONAME.
+
 * Sat Jan 05 2019 Vladimir D. Seleznev <vseleznv@altlinux.org> 1:5.45.4-alt2
 - built examples subpackage noarch.
 
